@@ -1,83 +1,19 @@
 import { Link } from 'react-router-dom'
-import AgencyHero from '../components/AgencyHero.jsx'
-import BlogCard from '../components/BlogCard.jsx'
-import FaqSection from '../components/FaqSection.jsx'
-import GetInTouch from '../components/GetInTouch.jsx'
-import SectionHeading from '../components/SectionHeading.jsx'
-import ServiceIcon from '../components/ServiceIcon.jsx'
-import Testimonials from '../components/Testimonials.jsx'
-import WhyChooseUs from '../components/WhyChooseUs.jsx'
 import blogPosts from '../data/blogPosts.js'
+import { faqs, industries } from '../data/siteContent.js'
+import { AudienceCards, CtaBand, FeatureRows, IntegrationStrip, QualifierFlow, Section, StatStrip } from '../components/Sections.jsx'
 
-const services = [
-  {
-    type: 'ppc',
-    number: '01',
-    title: 'PPC campaign management',
-    description: 'Build paid search campaigns around the customers and outcomes that matter.',
-  },
-  {
-    type: 'meta',
-    number: '02',
-    title: 'Meta Ads',
-    description: 'Reach new audiences on Facebook and Instagram with creative that gets noticed.',
-  },
-  {
-    type: 'google',
-    number: '03',
-    title: 'Google Ads',
-    description: 'Capture high-intent searches with focused campaigns and useful landing pages.',
-  },
-  {
-    type: 'leads',
-    number: '04',
-    title: 'Lead generation',
-    description: 'Turn more of your marketing attention into qualified enquiries for your team.',
-  },
-]
-
-function Home() {
-  return (
-    <>
-      <AgencyHero />
-
-      <section className="home-services section-space" id="growth-services">
-        <div className="page-container">
-          <div className="home-section-heading">
-            <SectionHeading eyebrow="What we do" title="Paid media with a clear purpose." />
-            <Link className="home-section-link" to="/services">Explore campaign services <span aria-hidden="true">↗</span></Link>
-          </div>
-          <div className="service-grid">
-            {services.map((service) => (
-              <article className="service-card" key={service.number}>
-                <div className="card-topline"><ServiceIcon type={service.type} /><span>{service.number}</span></div>
-                <h3>{service.title}</h3>
-                <p>{service.description}</p>
-                <Link className="card-link" to="/services">Explore service <span aria-hidden="true">↗</span></Link>
-              </article>
-            ))}
-          </div>
-          <div className="home-services-foot"><span>One connected plan across paid search, paid social, and lead generation.</span><Link to="/contact">Talk about your goals <span aria-hidden="true">→</span></Link></div>
-        </div>
-      </section>
-
-      <WhyChooseUs />
-
-      <section className="home-journal section-space">
-        <div className="page-container">
-          <div className="home-section-heading journal-section-heading">
-            <SectionHeading eyebrow="From the blog" title="Ideas for better campaigns." />
-            <Link className="home-section-link" to="/blog">More marketing insights <span aria-hidden="true">↗</span></Link>
-          </div>
-          <div className="blog-grid">{blogPosts.slice(0, 3).map((post) => <BlogCard key={post.slug} post={post} />)}</div>
-        </div>
-      </section>
-
-      <Testimonials />
-      <FaqSection />
-      <GetInTouch />
-    </>
-  )
+export default function Home() {
+  return <>
+    <section className="home-hero"><div className="container home-hero-grid"><div className="home-hero-copy"><p className="section-kicker">UK pay-per-call and lead generation</p><h1>Make better connections with people ready to talk.</h1><p>Ringstack brings advertisers and publishers together around relevant calls and leads, with clear campaign requirements from the outset.</p><div className="home-hero-actions"><Link className="button button-primary" to="/contact">Get started</Link></div></div><div className="hero-art" aria-label="Ringstack connects advertisers, publishers and customer enquiries"><div className="hero-art-card"><span className="hero-art-orb" aria-hidden="true">R</span><strong>Better connections</strong><span>From campaign brief to customer conversation</span></div><div className="hero-art-card"><span>01 / Demand</span><strong>Advertisers</strong></div><div className="hero-art-card"><span>02 / Supply</span><strong>Publishers</strong></div></div></div></section>
+    <Section compact><QualifierFlow/></Section>
+    <StatStrip/>
+    <Section><div className="market-intro"><div><p className="section-kicker">Performance with purpose</p><h2>Connect intent with the right team.</h2></div><div><p>Relevant calls and enquiries begin with clear expectations. Ringstack helps advertisers define what they need, publishers understand campaign fit, and partners agree how activity will be handled and measured.</p><p>Campaign plans should also account for applicable UK GDPR and PECR requirements, TPS screening where relevant, and appropriate consent for call recording.</p><div className="tag-list">{industries.map((industry)=><Link className="tag" key={industry.slug} to={`/industries/${industry.slug}`}>{industry.name}</Link>)}</div></div></div></Section>
+    <Section eyebrow="Who we work with" title="Built for both sides of the marketplace" intro="Whether you need suitable calls and leads or campaigns for your traffic, start with a clear brief and a direct conversation."><AudienceCards/></Section>
+    <section className="section section-divider"><div className="container"><div className="section-heading"><p className="section-kicker">Why Ringstack</p><h2>Clear terms. Useful support. Better decisions.</h2><p>Good campaign relationships depend on practical details being understood by everyone involved.</p></div></div><FeatureRows/></section>
+    <IntegrationStrip/>
+    <Section eyebrow="Resources" title="Notes for better campaign planning" intro="Practical guidance for advertisers and publishers working with calls and leads."><div className="three-grid resource-grid">{blogPosts.slice(0,3).map((post)=><article className="card resource-card" key={post.slug}><div className="blog-art" aria-hidden="true">{post.artMark || 'R'}</div><p className="section-kicker">{post.category}</p><h3>{post.title}</h3><p>{post.excerpt}</p><Link className="card-link" to={`/blog/${post.slug}`}>Read the article <span aria-hidden="true">→</span></Link></article>)}</div><p className="resource-more"><Link className="button button-secondary" to="/resources">Browse all resources</Link></p></Section>
+    <Section eyebrow="Common questions" title="A few useful answers"><div className="faq-list">{faqs.map((faq)=><details key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}</div></Section>
+    <CtaBand title="Looking for a campaign partner?" intro="Tell us what you need or what you can provide. We’ll help you explore a suitable next step."/>
+  </>
 }
-
-export default Home

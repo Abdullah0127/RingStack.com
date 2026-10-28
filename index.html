@@ -3,12 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#fbfcfa" />
+    <meta name="theme-color" content="#f7faf8" />
+    <script>
+      (() => {
+        let theme = 'light';
+        try { theme = localStorage.getItem('ringstack-theme') || ''; } catch {}
+        if (theme !== 'dark' && theme !== 'light') theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.dataset.theme = theme;
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#101916' : '#f7faf8');
+      })();
+    </script>
     <link rel="icon" href="/favicon.ico" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/favicon.ico" />
-    <meta name="description" content="Ringstack brings together pay-per-call customer acquisition, web development, and dependable UK IT infrastructure support." />
-    <title>Ringstack | Technology built for commercial growth</title>
+    <meta name="description" content="UK pay-per-call and lead generation connecting advertisers with publishers across insurance, finance, home services and more." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Pay-per-call and lead generation | Ringstack" />
+    <meta property="og:description" content="UK pay-per-call and lead generation connecting advertisers with publishers." />
+    <meta property="og:site_name" content="Ringstack" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Pay-per-call and lead generation | Ringstack" />
+    <meta name="twitter:description" content="UK pay-per-call and lead generation connecting advertisers and publishers around relevant calls and enquiries." />
+    <meta property="og:url" content="/" />
+    <link rel="canonical" />
+    <title>Pay-per-call and lead generation | Ringstack</title>
   </head>
   <body>
     <div id="root"></div>

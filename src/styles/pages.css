@@ -1,0 +1,18 @@
+.home-hero { padding: clamp(40px, 7vw, 88px) 0 44px; background: radial-gradient(ellipse at 85% 36%, var(--accent-soft), transparent 38%); }
+.home-hero-grid { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(340px, .88fr); align-items: center; gap: clamp(28px, 6vw, 72px); }
+.home-hero-copy { max-width: 710px; }
+.home-hero-copy h1 { max-width: 22ch; }
+.home-hero-copy > p:not(.section-kicker) { max-width: 58ch; font-size: 1.1rem; }
+.home-hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.market-intro { display: grid; grid-template-columns: .8fr 1.2fr; align-items: start; gap: 40px; }
+.market-intro h2 { max-width: 18ch; }
+.audience-card { min-height: 100%; }
+.resource-card h3 { margin-bottom: 10px; }
+.resource-card .card-link { margin-top: auto; }
+.industry-visual { display: grid; min-height: 180px; place-items: center; border-radius: var(--radius-card); background: var(--surface-soft); color: var(--accent-ink); font-size: 2.5rem; font-weight: 700; }
+.resource-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.resource-more { margin-top: 24px; }
+.policy-note { margin-top: 24px; padding: 16px; border-radius: var(--radius-control); background: var(--surface-soft); }
+.form select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%); background-position: calc(100% - 18px) 20px, calc(100% - 13px) 20px; background-repeat: no-repeat; background-size: 5px 5px, 5px 5px; }
+@media (max-width: 900px) { .home-hero-grid, .market-intro { grid-template-columns: 1fr; } .home-hero-grid { gap: 28px; } .resource-grid { grid-template-columns: 1fr; } }
+@media (min-width: 901px) and (max-width: 1100px) { .home-hero-grid { grid-template-columns: 1.1fr .9fr; } }

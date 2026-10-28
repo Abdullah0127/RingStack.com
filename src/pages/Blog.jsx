@@ -1,35 +1,4 @@
-import { Link } from 'react-router-dom'
-import BlogCard from '../components/BlogCard.jsx'
-import SectionHeading from '../components/SectionHeading.jsx'
+import { Link, useLocation } from 'react-router-dom'
 import blogPosts from '../data/blogPosts.js'
-
-function Blog() {
-  return (
-    <div className="blog-page">
-      <section className="blog-hero">
-        <div className="page-container blog-hero-inner">
-          <div>
-            <p className="eyebrow"><span className="eyebrow-dot" /> Ringstack blogs</p>
-            <h1>Ideas for <em>growing your business.</em></h1>
-            <p>Simple advice on leads, websites, and IT.</p>
-          </div>
-          <div className="blog-hero-note"><span className="blog-note-mark">R<span>.</span></span><span>Practical perspective.<br />No noise.</span></div>
-        </div>
-      </section>
-
-      <section className="blog-listing section-space page-container">
-        <SectionHeading eyebrow="From our team" title="Latest posts" />
-        <div className="blog-grid">
-          {blogPosts.map((post) => <BlogCard key={post.slug} post={post} />)}
-        </div>
-      </section>
-
-      <section className="blog-subscribe page-container">
-        <div><p className="eyebrow">Have a question?</p><h2>Let’s talk.</h2><p>Tell us what your business needs.</p></div>
-        <Link className="button button-lime" to="/contact">Get in touch <span aria-hidden="true">↗</span></Link>
-      </section>
-    </div>
-  )
-}
-
-export default Blog
+import { CtaBand } from '../components/Sections.jsx'
+export default function Blog(){const resources=useLocation().pathname==='/resources';return <><header className="page-hero"><div className="container"><p className="section-kicker">{resources?'Ringstack resources':'Ringstack insights'}</p><h1>{resources?'Resources for practical campaign planning':'Clear thinking on calls, leads and campaigns.'}</h1><p>Useful guidance for advertisers and publishers working with performance campaigns.</p></div></header><section className="section"><div className="container three-grid resource-grid">{blogPosts.map((post)=><article className="card resource-card" key={post.slug}><div className="blog-art" aria-hidden="true">{post.artMark||'R'}</div><p className="section-kicker">{post.category} · {post.readTime}</p><h2>{post.title}</h2><p>{post.excerpt}</p><Link className="card-link" to={`/blog/${post.slug}`}>Read article <span aria-hidden="true">→</span></Link></article>)}</div></section><CtaBand/></>}

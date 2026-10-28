@@ -1,115 +1,141 @@
-import { useEffect, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { useEffect, useRef, useState } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { BRAND, industries, navItems } from "../data/siteContent.js";
 
-const navItems = [
-  { label: 'Home', to: '/' },
-  { label: 'About', to: '/about' },
-  { label: 'Blogs', to: '/blog' },
-  { label: 'Services', to: '/services' },
-  
-  { label: 'Contact', to: '/contact' },
-]
+const advertiserLogin = import.meta.env.VITE_ADVERTISER_LOGIN_URL;
+const publisherLogin = import.meta.env.VITE_PUBLISHER_LOGIN_URL;
 
-function Header() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(() => window.scrollY > 12)
-  const [theme, setTheme] = useState(() => localStorage.getItem('ringstack-theme') || 'light')
-  const location = useLocation()
-  const hasDarkHero = location.pathname === '/'
-    || ['/services', '/about', '/contact', '/blog'].includes(location.pathname)
-    || location.pathname.startsWith('/blog/')
-
+function Dropdown({ label, children, open, onToggle }) {
+  const ref = useRef(null);
   useEffect(() => {
-    const updateScroll = () => setIsScrolled(window.scrollY > 12)
-    window.addEventListener('scroll', updateScroll, { passive: true })
-    updateScroll()
-    return () => window.removeEventListener('scroll', updateScroll)
-  }, [])
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme
-    localStorage.setItem('ringstack-theme', theme)
-  }, [theme])
-
-  useEffect(() => {
-    const desktopViewport = window.matchMedia('(min-width: 901px)')
-    const closeMenuOnDesktop = (event) => {
-      if (event.matches) setMenuOpen(false)
+    function onKeyDown(event) {
+      if (event.key === "Escape") onToggle(false);
     }
-
-    desktopViewport.addEventListener('change', closeMenuOnDesktop)
-    return () => desktopViewport.removeEventListener('change', closeMenuOnDesktop)
-  }, [])
-
-  function closeMenu() {
-    setMenuOpen(false)
-  }
-
+    function onPointerDown(event) {
+      if (ref.current && !ref.current.contains(event.target)) onToggle(false);
+    }
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, [onToggle]);
   return (
-    <header className={`site-header${hasDarkHero ? ' is-home' : ''}${isScrolled ? ' is-scrolled' : ''}`}>
-      <div className="header-inner">
-        <Link className="brand" to="/" aria-label="Ringstack home" onClick={closeMenu}>
-          <span className="brand-symbol" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </span>
-          <span className="brand-name"><span>Ringstack.</span></span>
-        </Link>
+    <div className="nav-dropdown" ref={ref}>
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => onToggle(!open)}
+      >
+        {label} <span aria-hidden="true">⌄</span>
+      </button>
+      {open && <div className="dropdown-panel">{children}</div>}
+    </div>
+  );
+}
 
+export default function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdown, setDropdown] = useState("");
+  const [theme, setTheme] = useState(
+    () => document.documentElement.dataset.theme || "light",
+  );
+  const toggleDropdown = (name) => (open) => setDropdown(open ? name : "");
+  function toggleTheme() {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem("ringstack-theme", next);
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", next === "dark" ? "#101916" : "#f7faf8");
+  }
+  function closeMenu() {
+    setMenuOpen(false);
+    setDropdown("");
+  }
+  return (
+    <header className="site-header">
+      <div className="container header-inner">
+        <Link to="/" className="brand" onClick={closeMenu}>
+          <span className="brand-mark" aria-hidden="true">
+            R
+          </span>
+          <span>{BRAND}</span>
+        </Link>
         <button
-          className={`menu-toggle${menuOpen ? ' is-open' : ''}`}
+          className="menu-toggle"
           type="button"
           aria-expanded={menuOpen}
           aria-controls="primary-navigation"
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          onClick={() => setMenuOpen((open) => !open)}
+          onClick={() => setMenuOpen(!menuOpen)}
         >
-          <span />
-          <span />
+          {menuOpen ? "Close" : "Menu"}
         </button>
-
         <nav
           id="primary-navigation"
-          className={`primary-navigation${menuOpen ? ' is-open' : ''}`}
+          className={`primary-navigation${menuOpen ? " open" : ""}`}
           aria-label="Main navigation"
         >
+          <Dropdown
+            label="Industries"
+            open={dropdown === "industries"}
+            onToggle={toggleDropdown("industries")}
+          >
+            {industries.map((item) => (
+              <Link
+                key={item.slug}
+                to={`/industries/${item.slug}`}
+                onClick={closeMenu}
+              >
+                {item.name}
+              </Link>
+            ))}
+            <Link to="/industries" onClick={closeMenu}>
+              All industries
+            </Link>
+          </Dropdown>
           {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === '/'}
-              className={({ isActive }) => `nav-link${isActive ? ' is-active' : ''}`}
-              onClick={closeMenu}
-            >
+            <NavLink key={item.to} to={item.to} onClick={closeMenu}>
               {item.label}
             </NavLink>
           ))}
+          {(advertiserLogin || publisherLogin) && (
+            <Dropdown
+              label="Login"
+              open={dropdown === "login"}
+              onToggle={toggleDropdown("login")}
+            >
+              {advertiserLogin && (
+                <a href={advertiserLogin} target="_blank" rel="noreferrer">
+                  Advertiser login
+                </a>
+              )}
+              {publisherLogin && (
+                <a href={publisherLogin} target="_blank" rel="noreferrer">
+                  Publisher login
+                </a>
+              )}
+            </Dropdown>
+          )}
           <Link
-            className="button button-small button-dark nav-cta"
+            className="button button-primary"
             to="/contact"
             onClick={closeMenu}
           >
-            Let’s talk <span aria-hidden="true">↗</span>
+            Get started
           </Link>
         </nav>
         <button
           className="theme-toggle"
           type="button"
-          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-          onClick={() => setTheme((currentTheme) => currentTheme === 'dark' ? 'light' : 'dark')}
+          onClick={toggleTheme}
+          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            {theme === 'dark'
-              ? <><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" /></>
-              : <><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z" /><path d="m16.5 4 .6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6.6-1.4Z" /></>}
-          </svg>
+          {theme === "dark" ? "☀" : "◐"}
         </button>
       </div>
-      {location.pathname !== '/' && <div className="header-rule" />}
     </header>
-  )
+  );
 }
-
-export default Header

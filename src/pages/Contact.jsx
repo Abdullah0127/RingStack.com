@@ -1,72 +1,52 @@
 import { useState } from 'react'
-import SectionHeading from '../components/SectionHeading.jsx'
+import { useSearchParams } from 'react-router-dom'
+import { ADDRESS, CONTACT_EMAIL, LOCATION, PHONE, PHONE_TEL } from '../data/siteContent.js'
 
-function Contact() {
-  const [emailAppOpened, setEmailAppOpened] = useState(false)
-
-  function handleSubmit(event) {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const subject = `Website inquiry from ${formData.get('name')}`
-    const body = [
-      `Name: ${formData.get('name')}`,
-      `Work email: ${formData.get('email')}`,
-      `Phone: ${formData.get('phone') || 'Not provided'}`,
-      '',
-      'How can we help?',
-      formData.get('message'),
-    ].join('\n')
-    const mailto = `mailto:hello@ringstack.co.uk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    window.location.href = mailto
-    setEmailAppOpened(true)
-  }
-
-  return (
-    <>
-      <section className="contact-hero">
-        <div className="page-container contact-hero-inner">
-          <div className="contact-intro">
-            <p className="eyebrow"><span className="eyebrow-dot" /> Get in touch</p>
-            <h1>Let’s talk about <em>your next campaign.</em></h1>
-            <p>Tell us what you want to achieve with PPC, Meta Ads, Google Ads, or lead generation.</p>
-            <p className="response-note"><span className="proof-dot" /> We usually reply within one business day.</p>
-            <div className="contact-direct">
-              <span>Prefer email or phone?</span>
-              <a href="mailto:hello@ringstack.co.uk">hello@ringstack.co.uk</a>
-              <a href="tel:07737139740">07737139740</a>
-            </div>
-          </div>
-
-          <form className="contact-form" onSubmit={handleSubmit}>
-            <div className="form-heading"><h2>Send us a message</h2><p>Fields marked * are required.</p></div>
-            <label htmlFor="contact-name">Full name <span>*</span></label>
-            <input id="contact-name" name="name" type="text" autoComplete="name" placeholder="Jane Doe" required />
-            <label htmlFor="contact-email">Work email <span>*</span></label>
-            <input id="contact-email" name="email" type="email" autoComplete="email" placeholder="hello@ringstack.com" required />
-            <label htmlFor="contact-phone">Phone number</label>
-            <input id="contact-phone" name="phone" type="tel" autoComplete="tel" placeholder="07737139740" />
-            <label htmlFor="contact-message">Your message <span>*</span></label>
-            <textarea id="contact-message" name="message" rows="4" placeholder="How can we help?" required />
-            <button className="button button-dark form-submit" type="submit">Send message <span aria-hidden="true">↗</span></button>
-            {emailAppOpened && <p className="form-note" role="status">Your email app should open with your inquiry ready to send. If it doesn’t, email us at <a href="mailto:hello@ringstack.co.uk">hello@ringstack.co.uk</a>.</p>}
-            <p className="form-privacy">Your email app will open so you can review and send your message.</p>
-          </form>
-        </div>
-      </section>
-
-      <section className="contact-details section-space">
-        <div className="page-container">
-          <SectionHeading eyebrow="Contact details" title="We’re here to help" />
-          <div className="contact-detail-grid">
-            <article><span className="detail-icon">⌖</span><h3>London, UK</h3><p>Working across the UK and beyond</p></article>
-            <article><span className="detail-icon">▦</span><h3>Office</h3><p>Office 7641, 58 Peregrine Road<br />Hainault, Ilford, Essex<br />IG6 3SZ</p></article>
-            <article><span className="detail-icon">ARIANT</span><h3>Weekdays</h3><p>09:00–18:00 UK time</p></article>
-            
-          </div>
-        </div>
-      </section>
-    </>
-  )
+function ContactMethod({ icon, label, children }) {
+  return <div className="contact-method"><span className="contact-method-icon" aria-hidden="true">{icon}</span><div className="contact-method-copy"><span className="contact-method-label">{label}</span>{children}</div></div>
 }
 
-export default Contact
+export default function Contact() {
+  const [searchParams] = useSearchParams()
+  const [status, setStatus] = useState({ type: '', message: '' })
+  const defaultType = searchParams.get('type') === 'publisher' ? 'Publisher' : 'Advertiser'
+
+  function submit(event) {
+    event.preventDefault()
+    const form = event.currentTarget
+    const data = new FormData(form)
+    const body = [`Name: ${data.get('name')}`, `Email: ${data.get('email')}`, `Phone: ${data.get('phone') || 'Not provided'}`, `I am a: ${data.get('type')}`, '', String(data.get('message'))].join('\n')
+    try {
+      window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Ringstack enquiry from ${data.get('name')}`)}&body=${encodeURIComponent(body)}`
+      setStatus({ type: 'success', message: `Your email draft is ready to review. If your email app does not open, email ${CONTACT_EMAIL}.` })
+    } catch {
+      setStatus({ type: 'error', message: `We could not open an email draft. Please email ${CONTACT_EMAIL} directly.` })
+    }
+  }
+
+  return <>
+    <header className="page-hero"><div className="container"><p className="section-kicker">Contact Ringstack</p><h1>Let’s talk calls and leads.</h1><p>Tell us whether you’re an advertiser, publisher or agent, and what you want to achieve.</p></div></header>
+    <section className="section"><div className="container contact-grid">
+      <form className="form" onSubmit={submit}>
+        <h2>Send an enquiry</h2><p>Required fields are marked with an asterisk. Your email app will open so you can review and send the message.</p>
+        <label htmlFor="contact-name">Full name *</label><input id="contact-name" name="name" autoComplete="name" required/>
+        <label htmlFor="contact-email">Work email *</label><input id="contact-email" name="email" type="email" autoComplete="email" required/>
+        <label htmlFor="contact-phone">Telephone</label><input id="contact-phone" name="phone" type="tel" autoComplete="tel"/>
+        <label htmlFor="contact-type">I am a</label><select id="contact-type" name="type" defaultValue={defaultType}><option>Advertiser</option><option>Publisher</option><option>Individual agent</option><option>Other</option></select>
+        <label htmlFor="contact-message">How can we help? *</label><textarea id="contact-message" name="message" rows="5" required/>
+        <button className="button button-primary" type="submit">Prepare email</button>
+        {status.message && <p className={`form-note form-note--${status.type}`} role="status" aria-live="polite">{status.message}</p>}
+      </form>
+      <aside className="contact-card">
+        <p className="section-kicker">Direct contact</p><h2>Reach our team</h2><p className="contact-card-intro">Choose the way that works best for you.</p>
+        <div className="contact-details">
+          <ContactMethod icon="@" label="Email"><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></ContactMethod>
+          {PHONE.verified && PHONE.value && <ContactMethod icon="☎" label="Telephone"><a href={`tel:${PHONE_TEL}`}>{PHONE.value}</a></ContactMethod>}
+          {ADDRESS.verified && ADDRESS.value && <ContactMethod icon="⌂" label="Office"><address>{ADDRESS.value.map((line) => <span key={line}>{line}</span>)}</address></ContactMethod>}
+          {LOCATION.verified && LOCATION.value && <ContactMethod icon="⌖" label={LOCATION.value}><p>{LOCATION.detail}</p></ContactMethod>}
+        </div>
+      </aside>
+    </div></section>
+    <section className="section section--compact"><div className="container cta-band"><div><p className="section-kicker">Prefer to email?</p><h2>Write to the Ringstack team.</h2><p>Use your email app to send a message directly to us.</p></div><a className="button button-on-inverse" href={`mailto:${CONTACT_EMAIL}`}>Email Ringstack</a></div></section>
+  </>
+}
